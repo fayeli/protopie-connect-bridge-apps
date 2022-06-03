@@ -7,17 +7,25 @@
     <script src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.js"></script>
   </head>
   <body>
-    <button onclick="handle_click()">Get Luke</button>
+    <button onclick="handle_click()">Make a fake call</button>
     <script>
       // ProtoPie address for socket.io communication
       const address = 'http://localhost:9981';
 
       async function handle_click() {
-        try {
-          const res = await fetch('https://swapi.dev/api/people/1/');
-          const person = await res.json();
 
-          // send the name of perosn received
+        // generate random id
+        const array = [1,3,4,5,10]
+        const id = array[Math.floor(Math.random() * array.length)];
+        console.log('[ API ] fetching people, id: ' + id)
+
+        try {
+          const res = await fetch('https://swapi.dev/api/people/' + id);
+          const data = await res.json();
+
+          console.log('[ API ] got data for people ', id, data)
+
+          // send the name of planet received
           const socket = io(address, {
             transports: ['websocket'],
           });
@@ -26,10 +34,10 @@
               alert(`ProtoPie Connect cannot found at ${address}`)
             )
             .on('connect', async () => {
-              // send people's name to ProtoPie Connect
+              // send name to ProtoPie Connect
               socket.emit('ppMessage', {
-                messageId: 'people',
-                value: person.name,
+                messageId: 'incoming_caller',
+                value: data.name,
               });
             });
         } catch (e) {
